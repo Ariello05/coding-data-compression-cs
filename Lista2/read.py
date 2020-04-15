@@ -1,6 +1,6 @@
-import struct
-from bitstring import ConstBitStream, BitArray
-from bitarray import bitarray
+from bitstring import ConstBitStream
+import sys
+from entropy import EntropyReader, BinaryEntropy, DynamicEntropy
 
 
 class Node:
@@ -61,7 +61,7 @@ char_code = {'{0:05b}'.format(
 class HuffmanCode:
 
     def decode(self, inputName, outputName):
-        print("-"*32)
+
         self.top = Node("NYT")
         self.top.value = 0
         self.NYT = self.top
@@ -76,18 +76,14 @@ class HuffmanCode:
             if self.NYT == self.top:
                 bits = file.read(8)
                 bits = str(bits)[2:]
-                #s = bits
 
-                # print(f"Bits: {bits}")
                 num = int(bits, 16)
                 character = chr(num)
-                # character = char_code[bits]
 
                 self.insert(character)
                 self.out.write(character)
             else:
                 node = self.top
-                # print(node.value, node.symbol)
                 while(node.left != None and node.right != None):
                     try:
                         bit = file.read(1)
@@ -97,14 +93,7 @@ class HuffmanCode:
                         return
 
                     bit = str(bit)[2:]
-                    #s += bit
-                    # if len(s) > 32:
-                    #    print(s[:32])
-                    #    s = s[32:]
-
-                    # print(f"Bit: {bit}")
                     if not bit:
-                        # print(s)
                         return
 
                     if bit == '0':
@@ -112,92 +101,101 @@ class HuffmanCode:
                     elif bit == '1':
                         node = node.right
 
-                    # print(bit, node.value, node.symbol)
-                    # print(f"Bit: {bit}")
-
                 character = node.symbol
                 if character == "NYT":
                     try:
                         bits = file.read(8)
                     except:
-                        # print(s)
                         self.out.close()
                         return
 
                     bits = str(bits)[2:]
-                    #s += bits
-
-                    # if len(s) > 32:
-                    #    print(s[:32])
-                    #    s = s[32:]
-                    # print(bits)
-
-                    #print(f"Bits: {bits}")
                     try:
-                        # character = char_code[bits]
                         num = int(bits, 16)
                         if num == 0:
                             return
 
                         character = chr(num)
                     except KeyError:
-                        #    print(s)
                         self.out.close()
                         return
 
                 self.out.write(character)
                 self.insert(character)
 
-            # self.top.traverse_from_top()
-        file.close()
+        # file.close()
         self.out.close()
+        print("SUCCESS")
 
     def encode(self, inputName, outputName):
+        print("-"*32)
+        er = EntropyReader(inputName)
+        entropy_in = er.getEntropy()
+        be = BinaryEntropy()
+        dynamic_entropy = DynamicEntropy()
+
         self.top = Node("NYT")
         self.top.value = 0
         self.NYT = self.top
         self.characters = {}
         self.bits = ""
 
+        self.out_bytes = 0
+        self.in_bytes = 0
+
         self.out = open(outputName, "wb")
 
         file = open(inputName, "r")
         while True:
             char = file.read(1)
+            self.in_bytes += 1
             if not char:
                 break
 
             ch = self.insert(char)
-            #re = int(ch, 2)
-            #print(ch, re)
+            dynamic_entropy.process(ch)
+
             self.bits += ch
 
             if len(self.bits) > 32:
                 wr, self.bits = self.bits[0:32], self.bits[32:]
-                print(wr)
+                be.process(wr)
                 num = int(wr, 2)
+                self.out_bytes += 4
                 by = num.to_bytes(4, byteorder="big")
                 self.out.write(by)
 
-        # print(self.bits)
         endFile = self.getTreeCoding(self.NYT)
-        # print(self.bits)
         bits = self.bits + endFile + ('0' * 32)
         bits = bits[0:32]
-
-        # testnode = self.characters["j"]
-        # print("j_test:", self.getTreeCoding(testnode))
-
-        print(bits)
+        # dynamic_entropy.process(bits)
+        be.process(bits)
+        self.out_bytes += 4
 
         num = int(bits, 2)
         by = num.to_bytes(4, byteorder="big")
 
-        self.top.traverse_from_top()
         self.out.write(by)
 
         file.close()
         self.out.close()
+
+        sum_ = sum([len(self.getTreeCoding(el))
+                    for el in self.characters.values()])
+
+        er = EntropyReader(outputName)
+        entropy_out = er.getEntropy()
+
+        #print(f"Entropy of in file: {entropy_in}")
+        #print(f"Entropy of out file (0/1 bits): {be.entropy()}")
+        # print(
+        #    f"Entropy of out file (standard bytes): {dynamic_entropy.entropy()}")
+        print(f"Entropy of out file (kody): {entropy_out}")
+        print("Compression level: {:4.2f}%".format(
+            self.out_bytes/self.in_bytes * 100))
+        print(
+            f"Average length of coded invidual character: {sum_/len(self.characters)}")
+        print("-"*32)
 
     def insert(self, char):  # encoding main function
         new_node = Node(char)
@@ -209,9 +207,6 @@ class HuffmanCode:
             new_top.right = new_node
             self.top = new_top
 
-            # write = fixed_code[char]
-            # write = ord(char)
-            # print(bin(ord(char))[2:])
             write = bin(ord(char))[2:]
             if int(write, 2) not in range(0, 127):
                 raise Exception(
@@ -352,22 +347,29 @@ class HuffmanCode:
         return str_
 
 
-hf = HuffmanCode()
-hf.encode("test.txt", "exit.bin")
-hf.decode("exit.bin", "exit2.txt")
+if __name__ == "__main__":
+    try:
+        if len(sys.argv) < 3:
+            print(f"FAILURE")
+            print(
+                f"Expected: (-E | --encode) or (-D | --decode) input output")
+            print(
+                f"Got:\t  {' '.join(sys.argv[1:])}")
+        else:
+            in_name = sys.argv[2]
+            out_name = sys.argv[3]
+            hc = HuffmanCode()
 
-# a = "00001000"
-# num = int(a, 2)
-# file = open("binary", "wb")
-# by = num.to_bytes(1, byteorder="big")
-# print(by)
+            code_type = sys.argv[1]
+            if code_type == "-E" or code_type == "--encode":
+                hc.encode(in_name, out_name)
+            elif code_type == "-D" or code_type == "--decode":
+                hc.decode(in_name, out_name)
+            else:
+                print(f"In first argument expected: (-E | --encode) or (-D | --decode) ")
+                print(f"Got:\t {sys.argv[1]}")
 
-# file.write(by)
-# file.close()
-# file = open("binary", "rb")
-# file = ConstBitStream(filename='binary')
-# r = file.read('bin:8')
-# print(r)
-# r = str(r)[2:]
-# print(r)
-# file.close()
+            print(f"SUCCESS")
+    except:
+        print(f"FAILURE")
+        raise

@@ -65,6 +65,52 @@ class SymbolPair:
         return local
 
 
+class DynamicEntropy:
+    def __init__(self):
+        self.total = 0
+        self.strings = {}
+
+    def process(self, string):
+        if string not in self.strings:
+            self.strings[string] = 1
+        else:
+            self.strings[string] += 1
+
+        self.total += 1
+
+    def entropy(self):
+        entropy = 0.0
+        for k in self.strings:
+            p = self.strings[k]/self.total
+            entropy += p*(-1)*math.log2(p)
+        return entropy
+
+
+class BinaryEntropy:
+    def __init__(self):
+        self.zero = 0
+        self.one = 1
+
+    def process(self, string):
+        for char in string:
+            if char == '0':
+                self.zero += 1
+            elif char == '1':
+                self.one += 1
+            else:
+                raise TypeError("String should only take 0 and 1s")
+
+    def entropy(self):
+        total = self.zero + self.one
+        p_1 = self.zero / total
+        p_2 = self.one / total
+
+        sum = p_1 * (-1)*math.log2(p_1)
+        sum += p_2 * (-1)*math.log2(p_2)
+
+        return sum
+
+
 class EntropyReader:
 
     def __init__(self, filename, binary='y'):
@@ -114,15 +160,3 @@ class EntropyReader:
             entropy_war += xcount * \
                 self.symbolsDictionary[k].getConditionalEntropy()
         return entropy_war/self.symbolsCount
-
-
-filename = input('Enter file path or --tadeusz: ')
-if (filename == '--tadeusz'):
-    filename = 'pan-tadeusz-czyli-ostatni-zajazd-na-litwie.txt'
-
-binary = input('Open as binary? [Y/n], default to Y!')
-er = EntropyReader(filename, binary)
-
-print(f"Entropy: \t{bcolors.OKGREEN}{er.getEntropy()}{bcolors.ENDC}")
-print(
-    f"Conditional: \t{bcolors.OKGREEN}{er.getConditionalEntropy()}{bcolors.ENDC}")
