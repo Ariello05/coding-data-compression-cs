@@ -1,0 +1,7 @@
+Wymagania:
+- python:
+  * biblioteka bitstring (https://pypi.org/project/bitstring/)
+
+Uruchamianie:
+./read.py --encode in.txt out.bit
+./read.py --decode out.bin res.txt
