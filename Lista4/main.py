@@ -1,6 +1,8 @@
 # autor Paweł Dychus
 import math
 from colors import *
+import sys
+import os
 
 
 class RGB:
@@ -231,8 +233,8 @@ def jpeg_ls(pixel_map, map_function):
     return result
 
 
-if __name__ == '__main__':
-    pixel_map = get_data('example3.tga')
+def run(filename):
+    pixel_map = get_data(filename)
     print("File loaded.")
     funs, names = get_map_functions()
     input_entropy = color_entropy(pixel_map)
@@ -263,3 +265,22 @@ if __name__ == '__main__':
     print(f"Best for all:\t({names[full_min[4]]}, {full_min[3]})")
 
     print("Finished.")
+
+
+if __name__ == '__main__':
+
+    try:
+        if len(sys.argv) < 2:
+            print(f"{OPENRED}FAILURE{CLOSECOLOR}")
+            print(
+                f"Expected: {OPENBLUE}filepath{CLOSECOLOR}")
+            print(
+                f"Got:\t  {' '.join(sys.argv[1:])}")
+        else:
+            filepath = sys.argv[1]
+            run(filepath)
+            print(f"{OPENGREEN}SUCCESS{CLOSECOLOR}")
+    except:
+        print(f"{OPENRED}FAILURE{CLOSECOLOR}")
+        raise
+
