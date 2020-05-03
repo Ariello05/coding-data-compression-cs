@@ -244,8 +244,9 @@ def run(filename, additionalInfo=False):
     print("File loaded.")
     funs, names = get_map_functions()
     input_entropy = color_entropy(pixel_map)
+    print()
     print(
-        f"input_entropy (r,g,b,all):({input_entropy[0]},{input_entropy[1]},{input_entropy[2]},{input_entropy[3]})")
+        f"input_entropy (Red,Green,Blue,All): \t({input_entropy[0]},{input_entropy[1]},{input_entropy[2]},{input_entropy[3]})")
 
     mod_entropy = []
     i = 0
@@ -263,31 +264,35 @@ def run(filename, additionalInfo=False):
 
     if additionalInfo:
         mod_entropy = sorted(mod_entropy, key=lambda u: u[0])
+        print()
         for i in range(len(funs)):
             print(
-                f"{OPENRED}Reds{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][0]})")
+                f"{OPENRED}Reds{CLOSECOLOR}:\t({mod_entropy[i][0]}, {names[mod_entropy[i][4]]})")
         mod_entropy = sorted(mod_entropy, key=lambda u: u[1])
+        print()
         for i in range(len(funs)):
             print(
-                f"{OPENGREEN}Greens{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][1]})")
+                f"{OPENGREEN}Greens{CLOSECOLOR}:\t({mod_entropy[i][1]}, {names[mod_entropy[i][4]]})")
         mod_entropy = sorted(mod_entropy, key=lambda u: u[2])
+        print()
         for i in range(len(funs)):
             print(
-                f"{OPENBLUE}Blues{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][2]})")
+                f"{OPENBLUE}Blues{CLOSECOLOR}:\t({mod_entropy[i][2]}, {names[mod_entropy[i][4]]})")
         mod_entropy = sorted(mod_entropy, key=lambda u: u[3])
+        print()
         for i in range(len(funs)):
             print(
-                f"{CLOSECOLOR}Alls{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][3]})")
+                f"{CLOSECOLOR}Alls{CLOSECOLOR}:\t\t({mod_entropy[i][3]}, {names[mod_entropy[i][4]]})")
 
-    print("\n\t\t\t(name,value)")
+    print("\n\t\t\t(value,name)")
     print(
-        f"Best for {OPENRED}red{CLOSECOLOR}:\t({names[red_min[4]]}, {red_min[0]})")
+        f"Best for {OPENRED}red{CLOSECOLOR}:\t({red_min[0]}, {names[red_min[4]]})")
     print(
-        f"Best for {OPENGREEN}green{CLOSECOLOR}:\t({names[green_min[4]]}, {green_min[1]})")
+        f"Best for {OPENGREEN}green{CLOSECOLOR}:\t({green_min[1]}, {names[green_min[4]]})")
     print(
-        f"Best for {OPENBLUE}blue{CLOSECOLOR}:\t({names[blue_min[4]]}, {blue_min[2]})")
+        f"Best for {OPENBLUE}blue{CLOSECOLOR}:\t({blue_min[2]}, {names[blue_min[4]]})")
     print(
-        f"Best for {CLOSECOLOR}all{CLOSECOLOR}:\t({names[full_min[4]]}, {full_min[3]})")
+        f"Best for {CLOSECOLOR}all{CLOSECOLOR}:\t     ({full_min[3]}, {names[full_min[4]]})")
 
     print("Finished.")
 
