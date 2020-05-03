@@ -62,7 +62,7 @@ def color_entropy(pixel_map):
             g_stat[pixel.green] += 1
             b_stat[pixel.blue] += 1
 
-    all_stat = [(r_stat[i] + g_stat[i] + b_stat[i])//3 for i in range(0, 256)]
+    all_stat = [(r_stat[i] + g_stat[i] + b_stat[i])/3 for i in range(0, 256)]
 
     r_stat = list(filter(lambda u: u > 0, r_stat))  # remove 0s
     g_stat = list(filter(lambda u: u > 0, g_stat))
@@ -119,7 +119,7 @@ def load_image(f, file_pixel_width, file_pixel_height):
     return image_mapped
 
 
-def get_data(filename):
+def get_data(filename, additionalInfo):
     with open(filename, 'rb') as f:
         byte = f.read(1)
         # print('ID LENGTH')
@@ -148,21 +148,25 @@ def get_data(filename):
 
         byte1 = f.read(1)
         byte2 = f.read(1)
-        print('Width')
+        if additionalInfo:
+            print('Width')
         # print(f'pixels: {byte1+byte2}')
         byte1 = int(byte1.hex(), 16)
         byte2 = int(byte2.hex(), 16) * 256
         file_pixel_width = byte1 + byte2
-        print(f'pixels [INT]: {file_pixel_width}')
+        if additionalInfo:
+            print(f'pixels [INT]: {file_pixel_width}')
 
         byte1 = f.read(1)
         byte2 = f.read(1)
-        print('Height')
+        if additionalInfo:
+            print('Height')
         # print(f'pixels: {byte1+byte2}')
         byte1 = int(byte1.hex(), 16)
         byte2 = int(byte2.hex(), 16) * 256
         file_pixel_height = byte1 + byte2
-        print(f'pixels [INT]: {file_pixel_height}')
+        if additionalInfo:
+            print(f'pixels [INT]: {file_pixel_height}')
 
         byte = f.read(1)
         # print('Pixel depth')
@@ -199,7 +203,7 @@ def get_map_functions():
     functions.append(lambda n, w, nw: w)
     functions.append(lambda n, w, nw: n)
     functions.append(lambda n, w, nw: nw)
-    functions.append(lambda n, w, nw: (n+w-nw) % 256)
+    functions.append(lambda n, w, nw: ((n+w)-nw) % 256)
     functions.append(lambda n, w, nw: (n+(w-nw)/2) % 256)
     functions.append(lambda n, w, nw: (w+(n-nw)/2) % 256)
     functions.append(lambda n, w, nw: ((n+w)/2) % 256)
@@ -213,18 +217,20 @@ def jpeg_ls(pixel_map, map_function):
     for i in range(0, len(pixel_map)):
         row = []
         for j in range(0, len(pixel_map[i])):
-            try:
+            if i > 0:
                 n = pixel_map[i-1][j]
-            except IndexError:
+            else:
                 n = RGB()
-            try:
+
+            if j > 0:
                 w = pixel_map[i][j-1]
-            except IndexError:
+            else:
                 w = RGB()
-            try:
+
+            if i > 0 and j > 0:
                 nw = pixel_map[i-1][j-1]
-            except IndexError:
-                n = RGB()
+            else:
+                nw = RGB()
 
             row.append((pixel_map[i][j]-map_function(n, w, nw)) % 256)
 
@@ -234,7 +240,7 @@ def jpeg_ls(pixel_map, map_function):
 
 
 def run(filename, additionalInfo=False):
-    pixel_map = get_data(filename)
+    pixel_map = get_data(filename, additionalInfo)
     print("File loaded.")
     funs, names = get_map_functions()
     input_entropy = color_entropy(pixel_map)
@@ -256,15 +262,19 @@ def run(filename, additionalInfo=False):
     full_min = min(mod_entropy, key=lambda u: u[3])
 
     if additionalInfo:
+        mod_entropy = sorted(mod_entropy, key=lambda u: u[0])
         for i in range(len(funs)):
             print(
                 f"{OPENRED}Reds{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][0]})")
+        mod_entropy = sorted(mod_entropy, key=lambda u: u[1])
         for i in range(len(funs)):
             print(
                 f"{OPENGREEN}Greens{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][1]})")
+        mod_entropy = sorted(mod_entropy, key=lambda u: u[2])
         for i in range(len(funs)):
             print(
                 f"{OPENBLUE}Blues{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][2]})")
+        mod_entropy = sorted(mod_entropy, key=lambda u: u[3])
         for i in range(len(funs)):
             print(
                 f"{CLOSECOLOR}Alls{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][3]})")

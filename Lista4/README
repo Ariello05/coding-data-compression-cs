@@ -1,0 +1,7 @@
+Wymagania:
+- python:
+
+Uruchamianie:
+./read.py filepath.tga
+./read.py filepath.tga -a
+  * -a, wyświetla dodatkowe informacje (wszystkie metryki)
