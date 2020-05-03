@@ -194,7 +194,7 @@ def new_standard(n, w, nw):
 def get_map_functions():
 
     names = ["W", "N", "NW", "N+W-NW",
-             "N+(W-NW)/2", "N+(W-NW)/2", "W+(N-NW)/2", "(N+W)/2", "New standard"]
+             "N+(W-NW)/2", "W+(N-NW)/2", "(N+W)/2", "New standard"]
     functions = []
     functions.append(lambda n, w, nw: w)
     functions.append(lambda n, w, nw: n)
@@ -233,7 +233,7 @@ def jpeg_ls(pixel_map, map_function):
     return result
 
 
-def run(filename):
+def run(filename, additionalInfo=False):
     pixel_map = get_data(filename)
     print("File loaded.")
     funs, names = get_map_functions()
@@ -255,6 +255,20 @@ def run(filename):
     blue_min = min(mod_entropy, key=lambda u: u[2])
     full_min = min(mod_entropy, key=lambda u: u[3])
 
+    if additionalInfo:
+        for i in range(len(funs)):
+            print(
+                f"{OPENRED}Reds{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][0]})")
+        for i in range(len(funs)):
+            print(
+                f"{OPENGREEN}Greens{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][1]})")
+        for i in range(len(funs)):
+            print(
+                f"{OPENBLUE}Blues{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][2]})")
+        for i in range(len(funs)):
+            print(
+                f"{CLOSECOLOR}Alls{CLOSECOLOR}:\t({names[mod_entropy[i][4]]}, {mod_entropy[i][3]})")
+
     print("\n\t\t\t(name,value)")
     print(
         f"Best for {OPENRED}red{CLOSECOLOR}:\t({names[red_min[4]]}, {red_min[0]})")
@@ -262,7 +276,8 @@ def run(filename):
         f"Best for {OPENGREEN}green{CLOSECOLOR}:\t({names[green_min[4]]}, {green_min[1]})")
     print(
         f"Best for {OPENBLUE}blue{CLOSECOLOR}:\t({names[blue_min[4]]}, {blue_min[2]})")
-    print(f"Best for all:\t({names[full_min[4]]}, {full_min[3]})")
+    print(
+        f"Best for {CLOSECOLOR}all{CLOSECOLOR}:\t({names[full_min[4]]}, {full_min[3]})")
 
     print("Finished.")
 
@@ -273,14 +288,16 @@ if __name__ == '__main__':
         if len(sys.argv) < 2:
             print(f"{OPENRED}FAILURE{CLOSECOLOR}")
             print(
-                f"Expected: {OPENBLUE}filepath{CLOSECOLOR}")
+                f"Expected: {OPENBLUE}filepath, <optionally> -a | --additionalInfo{CLOSECOLOR}")
             print(
                 f"Got:\t  {' '.join(sys.argv[1:])}")
         else:
             filepath = sys.argv[1]
-            run(filepath)
+            if len(sys.argv) == 3:
+                run(filepath, sys.argv[2])
+            else:
+                run(filepath)
             print(f"{OPENGREEN}SUCCESS{CLOSECOLOR}")
     except:
         print(f"{OPENRED}FAILURE{CLOSECOLOR}")
         raise
-
