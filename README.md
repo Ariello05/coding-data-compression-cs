@@ -5,3 +5,6 @@ Coding and data compression college course done with Python.
 
 * List1 - File entropy, and conditional file entropy
 * List2 - Adaptive Huffman coding
+* List3 - LZW encoding/decoding
+* List4 - JPEG-LS algorithm
+* List5 - Lossy compression, quantization algorithm
