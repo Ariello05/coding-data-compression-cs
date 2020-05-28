@@ -1,0 +1,6 @@
+Wymagania:
+- python:
+
+Uruchamianie:
+./main.py input.tga output.tga r g b
+<wariant na 3>
