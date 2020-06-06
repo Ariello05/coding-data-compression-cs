@@ -8,3 +8,4 @@ Coding and data compression college course done with Python.
 * List3 - LZW encoding/decoding
 * List4 - JPEG-LS algorithm
 * List5 - Lossy compression, quantization algorithm
+* List6 - Lossy compression, differential encoding
