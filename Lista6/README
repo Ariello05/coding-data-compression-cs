@@ -1,6 +1,17 @@
 Wymagania:
-- python:
+  - python:
 
-Uruchamianie:
-./main.py input.tga output.tga r g b
+Uruchamianie, dwa programy:
+
+  Kodujący/dekodujący:
+    python ./encoder.py (--encode -E | --decode -D) input.tga output.bin Bits
+    
+    np.
+    * python ./encoder.py -E example0.tga result.bin 3
+    * python ./encoder.py -D result.bin result.tga
+
+  Porównujący (mse,snr):
+    python ./comparer.py original.tga decoded.tga
+
+
 <wariant na 3>

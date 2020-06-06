@@ -220,7 +220,7 @@ def get_pixel_mapper(bits):
         next_ = current + step
 
         for j in range(current, next_):
-            map_[j] = floor((current+next_)/2)
+            map_[j] = round((current+next_)/2)
         current += step
 
     def pixel_mapper(pixel):
@@ -302,22 +302,6 @@ def encode(input_, output_, bits):
         for pixel in quantumized_map:
             f.write(pixel.file_format())
 
-    # mse_r, mse_g, mse_b, mse_all = get_MSE(pixel_map, quantumized_map)
-    # snr_r, snr_g, snr_b, snr_all = get_SNR(
-    #    pixel_map, [mse_r, mse_g, mse_b, mse_all])
-#
-    # print(f"mse\t= {mse_all}")
-    # print(f"mse(r)\t= {mse_r}")
-    # print(f"mse(g)\t= {mse_g}")
-    # print(f"mse(b)\t= {mse_b}")
-    # print()
-#
-    # print(f"SNR\t= {snr_all} ({10*log10(snr_all)}dB)")
-    # print(f"SNR(r)\t= {snr_r} ({10*log10(snr_r)}dB)")
-    # print(f"SNR(g)\t= {snr_g} ({10*log10(snr_g)}dB)")
-    # print(f"SNR(b)\t= {snr_b} ({10*log10(snr_b)}dB)")
-#
-    # tga.save_to_file(quantumized_map, "out.tga")
     print(f"Image proccessed and saved to: {output_}")
 
 
