@@ -24,6 +24,41 @@ available_codes = [
 ]
 
 
+def run(input_filename, output_filename):
+    with open(input_filename, "rb") as f:
+        bits = f.read()
+        bits = decode(bits)
+        with open(output_filename, "w", encoding="utf-8") as out:
+            counter = 0
+            while len(bits) >= 8:
+                counter += 1
+                bitstring = bits[:8]
+                value = chr(int(bitstring, 2))
+                out.write(value)
+                bits = bits[8:]
+
+
+def decode(text):
+    bits = ""
+    for character in text:
+        bitstring = bin(character)[2:].rjust(8, '0')
+        bits += bitstring
+
+    result = ""
+    error_count = 0
+    while len(bits) >= 8:
+        process = bits[:8]
+        decoded, error = get_encoded(process)
+        if error:
+            error_count += 1
+        result += decoded
+
+        bits = bits[8:]
+    print(f"Total of {error_count} errors.")
+
+    return result
+
+
 def get_encoded(bits):
     result = "0000"
 
@@ -41,40 +76,6 @@ def get_encoded(bits):
     return (result, True)
 
 
-def run(input_filename, output_filename):
-    with open(input_filename, "rb") as f:
-        bits = f.read()
-        bits = decode(bits)
-        with open(output_filename, "w", encoding="utf-8") as out:
-            while len(bits) >= 8:
-                bitstring = bits[:8]
-                value = chr(int(bitstring, 2))
-                out.write(value)
-                bits = bits[8:]
-
-
-def decode(text):
-    bits = ""
-    for character in text:
-        bitstring = bin(character)[2:].rjust(8, '0')
-        bits += bitstring
-        print(bitstring)
-
-    result = ""
-    error_count = 0
-    while len(bits) >= 8:
-        process = bits[:8]
-        decoded, error = get_encoded(process)
-        if error:
-            error_count += 1
-        result += decoded
-
-        bits = bits[8:]
-    print(f"Total of {error_count} errors.")
-
-    return result
-
-
 if __name__ == '__main__':
 
     try:
@@ -90,6 +91,6 @@ if __name__ == '__main__':
         print(f"{OPENRED}FAILURE{CLOSECOLOR}")
         print(e)
         print(
-            f"Expected: {OPENBLUE}input output{CLOSECOLOR}")
+            f"Expected: {OPENBLUE}input.bin output.txt{CLOSECOLOR}")
         print(
             f"Got:\t  {' '.join(sys.argv[1:])}")

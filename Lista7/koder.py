@@ -28,7 +28,6 @@ def run(input_filename, output_filename):
         bytes_ = encode(bits)
         with open(output_filename, "wb") as out:
             for byte in bytes_:
-                print(byte)
                 out.write(byte)
 
 
@@ -38,7 +37,6 @@ def encode(bits):
     while len(bits) >= 4:
         process = bits[:4]
         encoded = get_encoded(process)
-        print(encoded)
         num = int(encoded, 2)
         byte = num.to_bytes(1, byteorder="big")
         result.append(byte)
@@ -62,6 +60,6 @@ if __name__ == '__main__':
         print(f"{OPENRED}FAILURE{CLOSECOLOR}")
         print(e)
         print(
-            f"Expected: {OPENBLUE} input output{CLOSECOLOR}")
+            f"Expected: {OPENBLUE} input.txt output.bin{CLOSECOLOR}")
         print(
             f"Got:\t  {' '.join(sys.argv[1:])}")

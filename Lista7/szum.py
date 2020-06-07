@@ -5,6 +5,7 @@ import os
 import random
 
 
+
 def run(p, input_filename, output_filename):
     with open(input_filename, "rb") as f:
         bits = f.read()
@@ -51,6 +52,6 @@ if __name__ == '__main__':
         print(f"{OPENRED}FAILURE{CLOSECOLOR}")
         print(e)
         print(
-            f"Expected: {OPENBLUE} p input output{CLOSECOLOR}\n where p is between [0.0,1.0]")
+            f"Expected: {OPENBLUE} p input.bin output.bin{CLOSECOLOR}\n where p is between [0.0,1.0]")
         print(
             f"Got:\t  {' '.join(sys.argv[1:])}")
