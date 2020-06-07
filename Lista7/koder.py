@@ -17,19 +17,31 @@ def get_encoded(bits):
 
 
 def run(input_filename, output_filename):
-    with open(input_filename, "r") as f:
-        bits = f.read()
-        bits = encode(bits)
-        with open(output_filename, "w") as out:
-            out.write(bits)
+    with open(input_filename, "r", encoding="utf-8") as f:
+        text = f.read()
+        bits = ""
+        for character in text:
+            integer = ord(character)
+            bitstring = bin(integer)[2:].rjust(8, '0')
+            bits += bitstring
+
+        bytes_ = encode(bits)
+        with open(output_filename, "wb") as out:
+            for byte in bytes_:
+                print(byte)
+                out.write(byte)
 
 
 def encode(bits):
-    result = ""
+    result = []
 
     while len(bits) >= 4:
         process = bits[:4]
-        result += str(get_encoded(process))
+        encoded = get_encoded(process)
+        print(encoded)
+        num = int(encoded, 2)
+        byte = num.to_bytes(1, byteorder="big")
+        result.append(byte)
         bits = bits[4:]
 
     return result
