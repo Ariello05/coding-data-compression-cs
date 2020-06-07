@@ -1,0 +1,20 @@
+Wymagania:
+  - python:
+
+Uruchamianie, cztery programy:
+
+	Kodujący:
+		python ./koder.py input.txt output.bin
+		
+	Dekodujący:
+		python ./dekoder input.bin output.txt
+	
+	Szum:
+		python ./szum.py p input output
+		p = float[0.0-1.0]
+		
+		np. python ./szum.py 0.2 code.bin torn.bin
+	
+	Sprawdzanie:
+		python ./sprawdz input1 input2
+		
